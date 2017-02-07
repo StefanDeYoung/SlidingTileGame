@@ -18,29 +18,28 @@ def main(argv):
     searchType = argv[1]    # get search type requested (ie. bfs, dfs, ast, or ida)
 
     # change argv[2] from string '0,1,2,...,8' to a list ['0','1','2',...,'8'] then to a list of int [0,1,2,...,8]
-    root = new State    #STEFAN!
+    root = State(null, null, null, 0, 0)    #state, parent, path, depth, cost
     root.state = argv[2].split(',')
     root.state = [int(x) for x in root.state]
     root.state = tuple(root.state)
 
     # Calculate board dimension (n X n)
-    n = len(root.state)
+    #n = len(root.state)
 
     # generate the goal state as a tuple --> (0,1,2,...,n-1)
-    goal.state = tuple(range(n))
+    goal.state = tuple(range(len(root.state)))
 
     readout = solver (root, goal, searchType)
 
     prepareOutput (readout)
 
     # prepare to measure execution time of search function
-    t_Start = time.time()
-    finish, pushes, pops, f_size, f_maxsize, expanded, maxDepth = bfs(problem)
-    t_End = time.time()
-
-    print ('Reached goal:', finish.stateID, 'in time:', t_End-t_Start)
-    print ('Pushes:',pushes,', Pops:',pops,', Fringe @ goal:',f_size,', Fringe max size:',f_maxsize,', expanded:',expanded )
-    print ('Depth @ goal:', finish.depth, ', maxDepth:', maxDepth)
+    # t_Start = time.time()
+    # finish, pushes, pops, f_size, f_maxsize, expanded, maxDepth = bfs(problem)
+    # t_End = time.time()
+    # print ('Reached goal:', finish.stateID, 'in time:', t_End-t_Start)
+    # print ('Pushes:',pushes,', Pops:',pops,', Fringe @ goal:',f_size,', Fringe max size:',f_maxsize,', expanded:',expanded )
+    # print ('Depth @ goal:', finish.depth, ', maxDepth:', maxDepth)
 
 def prepareOutput(readout):
     ### Print output to file output.txt

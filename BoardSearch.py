@@ -3,96 +3,70 @@ import heapq
 
 class State:
 
-    def __init__(self, state, action, parent, path, depth, cost):
-        self.stateID = state        # stateID is a tuple, eg. ('0','1','2',...,'n-1')
-        self.action = action        # action is one of 'Up', 'Down', 'Left', 'Right' 
-        self.parentID = parent      # immediate predecessor state of this state (a tuple like stateID)
-        self.path = path            # cumulative path leading to this state, eg. a list ['Up', 'Right', 'Down'...]
-        self.depth = depth          # depth in search tree of this state; an integer
-        self.pathCost = cost        # cumulative cost of the path to reach this state from the initial state
+    def __init__(self, state, parent, path, depth, cost):
+        self.state    = state        # stateID is a tuple, eg. ('0','1','2',...,'n-1')
+        self.parent   = parent       # immediate predecessor state of this state (a tuple like stateID)
+        self.path     = path         # cumulative path leading to this state, eg. a list ['Up', 'Right', 'Down'...]
+        self.depth    = depth        # depth in search tree of this state; an integer
+        self.pathCost = cost         # cumulative cost of the path to reach this state from the initial state
         return
 
-class BoardSearchProblem:
-    '''
-    The BoardSearchProblem class is responsible for initializing a search problem,
-    determining when the goal has been reached and generating successor (children)
-    states to place on the fringe.
-    '''
-    def __init__(self, initialState, goalState, n):
-        
-        self.boardState = initialState
-        self.goalState = goalState
-        self.boardDim = n
-        self.action = ''
-        self.parent = ''
-        self.path = []
-        self.depth = 0
-        self.pathCost = 0
-        self.startState = State(self.boardState, self.action, self.parent, self.path, self.depth, self.pathCost)
-        
-        self.bfsActions = ['Up', 'Down', 'Left', 'Right']
-        
-        return
-
-    def getStartState(self):
-        return self.startState
-
-    def isGoalState(self, state):
-        isGoal = state.stateID == self.goalState
-        return isGoal
-
-    def getSuccessors(self, state):
+    def getSuccessors(parent):
         '''Returns successor (or child) states as a list of 4-tuples(childState, action, parent, path)'''
 
-        # create an empty list to hold successor (child) nodes. The list will contain
-        # complete State class objects, not just the stateID attribute.
+        actions = ["Up", "Down", "Left", "Right"]
         successors = []
+        childState = parent.state
 
-        parentStateID = state.stateID   # this is a tuple
-        
-        # Convert parentStateID from tuple form (0,1,2,...,n-1) to list form eg. [0,1,2,...,n-1]
-        parentList = list(parentStateID)
-        
-        # Find index of the "0" or blank tile
-        z_Idx = parentStateID.index(0)
-  
+        idx = parent.state.index(0) #get 1D index of 0 in parent state
+        row, col = index1to2(idx, n)
+
         # Check each potential action to determine if it is possible. If the action
         # is possible, set validAction to True, and carry out the action on childList
-        for dir in self.bfsActions:
-            validAction = False         # evaluated below; determines if a proposed action is possible 
-            childList = parentList[:]   # create a copy of the parent
-            
-            if dir == 'Up':
-                if z_Idx - self.boardDim >= 0:
+        for dir in actions:
+            validAction = False         # evaluated below; determines if a proposed action is possible
+
+            if (dir == 'Up' && row - 1 >= 0):
                     validAction = True
-                    # exchange the zero tile with the tile immediately above it
-                    childList[z_Idx], childList[z_Idx-self.boardDim] = childList[z_Idx-self.boardDim], childList[z_Idx]
-            elif dir == 'Down':
-                if z_Idx + self.boardDim < len(parentList):
+                    childState[idx], childState[index2to1(col, row + 1, n)] = childState[index2to1(col, row + 1, n)], childState[idx]
+            elif (dir == 'Down' && row + 1 >= n):
                     validAction = True
-                    # exchange the zero tile with the tile immediately below it
-                    childList[z_Idx], childList[z_Idx+self.boardDim] = childList[z_Idx+self.boardDim], childList[z_Idx]
-            elif dir == 'Left':
-                if (z_Idx % self.boardDim) - 1 >= 0:
+                    childState[idx], childState[index2to1(col, row + 1, n)] = childState[index2to1(col, row + 1, n)], childState[idx]
+            elif (dir == 'Left' && col - 1 >= 0 ):
                     validAction = True
-                    # exchange the zero tile with the tile immediately to the left
-                    childList[z_Idx], childList[z_Idx-1] = childList[z_Idx-1], childList[z_Idx]
-            elif dir == 'Right':
-                if (z_Idx % self.boardDim) + 1 < self.boardDim:
+                    childState[idx], childState[index2to1(col - 1, row, n)] = childState[index2to1(col - 1, row, n)], childState[idx]
+            elif (dir == 'Right' && col + 1):
                     validAction = True
-                    # exchange the zero tile with the tile immediately to the right
-                    childList[z_Idx], childList[z_Idx+1] = childList[z_Idx+1], childList[z_Idx]
+                    childState[idx], childState[index2to1(col + 1, row, n)] = childState[index2to1(col + 1, row, n)], childState[idx]
 
             # if the action has been deemed valid, complete the creation of a successor State object
             if validAction:
-                childStateID = tuple(childList)
-                childPath = state.path[:]          # get the cumulative path to this point
+                childPath = parent.path[:]          # get the cumulative path to this point
                 childPath.append(dir)
-                childDepth = state.depth + 1
-                childCost = state.pathCost + 1
-                successors.append(State(childStateID, dir, parentStateID, childPath, childDepth, childCost))
+                childDepth = parent.depth + 1
+                childCost = parent.pathCost + 1
+                successors.append(State(childState, parent.state, childPath, childDepth, childCost))
 
         return successors
+
+
+"""
+Utility functions
+"""
+
+def index1to2(idx, n):
+    row = int(idx/n)
+    col = int(idx % n)
+    return row, col
+
+def index2to1(row, col, n):
+    return col*n + row
+
+def swapTiles(node, direction):
+
+
+def isGoal(current, goal):
+    return current.state == goal.state
 
 """
  Data structures for search
@@ -133,7 +107,7 @@ class Queue:
 
     def length(self):
         return len(self.list)
-    
+
     def isEmpty(self):
         "Returns true if the queue is empty"
         return len(self.list) == 0
@@ -168,4 +142,3 @@ class PriorityQueue:
 
     def isEmpty(self):
         return len(self.heap) == 0
-
