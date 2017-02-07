@@ -3,7 +3,6 @@ import math
 import time
 import BoardSearch as bs
 
-
 def main(argv):
     '''
     Program is called from the command line like this:
@@ -23,15 +22,13 @@ def main(argv):
     root.state = [int(x) for x in root.state]
     root.state = tuple(root.state)
 
-    # Calculate board dimension (n X n)
-    #n = len(root.state)
-
     # generate the goal state as a tuple --> (0,1,2,...,n-1)
-    goal.state = tuple(range(len(root.state)))
+    goal = State(null, null, null, 0, 0)    #state, parent, path, depth, cost
+    goal.state = tuple(range(math.sqrt(len(root.state))))
 
-    readout = solver (root, goal, searchType)
-
-    prepareOutput (readout)
+    # Call the solver and output the solution to a text file
+    solution = solver (root, goal, searchType)
+    writeOutput (solution)
 
     # prepare to measure execution time of search function
     # t_Start = time.time()
@@ -41,7 +38,7 @@ def main(argv):
     # print ('Pushes:',pushes,', Pops:',pops,', Fringe @ goal:',f_size,', Fringe max size:',f_maxsize,', expanded:',expanded )
     # print ('Depth @ goal:', finish.depth, ', maxDepth:', maxDepth)
 
-def prepareOutput(readout):
+def writeOutput(readout):
     ### Print output to file output.txt
     orig_stdout = sys.stdout
     f = open('output.txt', 'w')

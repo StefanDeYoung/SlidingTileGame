@@ -12,12 +12,13 @@ class State:
         return
 
     def getSuccessors(parent):
-        '''Returns successor (or child) states as a list of 4-tuples(childState, action, parent, path)'''
+        '''Returns successor state objects'''
 
         actions = ["Up", "Down", "Left", "Right"]
         successors = []
         childState = parent.state
 
+        n = math.sqrt(len(parent.state))
         idx = parent.state.index(0) #get 1D index of 0 in parent state
         row, col = index1to2(idx, n)
 
@@ -55,15 +56,14 @@ Utility functions
 """
 
 def index1to2(idx, n):
+    '''Convert a 1d array index to col, row format'''
     row = int(idx/n)
     col = int(idx % n)
     return row, col
 
 def index2to1(row, col, n):
+    '''Convert col,row array indices to 1d array index'''
     return col*n + row
-
-def swapTiles(node, direction):
-
 
 def isGoal(current, goal):
     return current.state == goal.state
