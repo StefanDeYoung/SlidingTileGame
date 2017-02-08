@@ -17,18 +17,20 @@ def main(argv):
     searchType = argv[1]    # get search type requested (ie. bfs, dfs, ast, or ida)
 
     # change argv[2] from string '0,1,2,...,8' to a list ['0','1','2',...,'8'] then to a list of int [0,1,2,...,8]
-    root = State(null, null, null, 0, 0)    #state, parent, path, depth, cost
+    root = bs.State("", None, [], 0, 0)    #state, parent, path, depth, cost
     root.state = argv[2].split(',')
     root.state = [int(x) for x in root.state]
-    root.state = tuple(root.state)
 
-    # generate the goal state as a tuple --> (0,1,2,...,n-1)
-    goal = State(null, null, null, 0, 0)    #state, parent, path, depth, cost
-    goal.state = tuple(range(math.sqrt(len(root.state))))
+    # generate the goal state
+    goal = bs.State(None, None, None, 0, 0)    #state, parent, path, depth, cost
+    goal.state = range(int(math.sqrt(len(root.state))))
 
     # Call the solver and output the solution to a text file
-    solution = solver (root, goal, searchType)
-    writeOutput (solution)
+    sol = bs.Solution(0,0,0,0,0,0,0)
+    print(type(sol))
+    sol = solver (root, goal, searchType)
+    print(type(sol))
+    writeOutput(sol)
 
     # prepare to measure execution time of search function
     # t_Start = time.time()
@@ -38,19 +40,20 @@ def main(argv):
     # print ('Pushes:',pushes,', Pops:',pops,', Fringe @ goal:',f_size,', Fringe max size:',f_maxsize,', expanded:',expanded )
     # print ('Depth @ goal:', finish.depth, ', maxDepth:', maxDepth)
 
-def writeOutput(readout):
+def writeOutput(sol):
     ### Print output to file output.txt
+
     orig_stdout = sys.stdout
     f = open('output.txt', 'w')
     sys.stdout = f
 
-    print ('path_to_goal:',readout.finish.path)
+    print ('path_to_goal:',     sol.getPath())
     print ('cost_of_path:')
-    print ('nodes_expanded:', readout.expanded)
-    print ('fringe_size:', readout.f_size)
-    print ('max_fringe_size:', readout.f_maxsize)
-    print ('search_depth:', readout.finish.depth)
-    print ('max_search_depth:', readout.maxDepth)
+    print ('nodes_expanded:',   sol.expanded)
+    print ('fringe_size:',      sol.f_size)
+    print ('max_fringe_size:',  sol.f_maxsize)
+    print ('search_depth:',     sol.getDepth())
+    print ('max_search_depth:', sol.maxDepth)
     print ('running_time:')
     print ('max_ram_usage:')
 
@@ -58,18 +61,24 @@ def writeOutput(readout):
     f.close()
     #End of printout
 
-def solver(root, goal, searchType)
+def solver(root, goal, searchType):
+
+    sol = bs.Solution(0,0,0,0,0,0,0)
+
 
     if (searchType == 'bfs'):
-        bfs(root, goal)
+        sol = bfs(root, goal)
+        print(sol)
     elif (searchType == 'dfs'):
-        dfs(root, goal)
+        sol = dfs(root, goal)
     elif (searchType == 'ast'):
-        ast(root, goal)
+        sol = ast(root, goal)
     elif (searchType == 'ida'):
-        ida(root, goal)
+        sol = ida(root, goal)
     else:
         print("Invalid searchType")
+
+    return sol
 
 def bfs(root, goal):
     """Search the shallowest nodes in the search tree first."""
@@ -87,7 +96,7 @@ def bfs(root, goal):
 
     y = bs.Queue()
     visitedNodes = set()
-    y.push(startNode)
+    y.push(root)
     f_pushes += 1
     f_currentSize += 1
 
@@ -95,13 +104,15 @@ def bfs(root, goal):
         node = y.pop()
         f_pops += 1
         f_currentSize -= 1
-        if problem.isGoalState(node):
-            return node, f_pushes, f_pops, f_currentSize, f_maxsize, n_expanded, maxDepth
-        if node.stateID not in visitedNodes:
+        if bs.isGoal(node, goal):
+            sol = [node, f_pushes, f_pops, f_currentSize, f_maxsize, n_expanded, maxDepth]
+            return sol
+        if tuple(node.state) not in visitedNodes:
             n_expanded +=1
-            visitedNodes.add(node.stateID)
-            for childNode in problem.getSuccessors(node):
-                if childNode.stateID not in visitedNodes:
+            visitedNodes.add(tuple(node.state))
+            successors = node.getSuccessors()
+            for childNode in successors:
+                if tuple(childNode.state) not in visitedNodes:
                     y.push(childNode)
                     if childNode.depth > maxDepth:
                         maxDepth = childNode.depth
@@ -109,8 +120,8 @@ def bfs(root, goal):
                     f_currentSize += 1
                     if f_currentSize > f_maxsize:
                         f_maxsize = f_currentSize
-        #else:
-            #print ('%%%%% node: ', node.stateID, ' alredy in "visited"')
+
+    return "We did not return a solution for some reason"
 
 def dfs(root, goal):
     print('dfs is not yet implemented')

@@ -1,24 +1,26 @@
 # BoardSearch.py
 import heapq
+import math
 
 class State:
 
     def __init__(self, state, parent, path, depth, cost):
-        self.state    = state        # stateID is a tuple, eg. ('0','1','2',...,'n-1')
+        self.state    = state        # state is a list, eg. ('0','1','2',...,'n-1')
         self.parent   = parent       # immediate predecessor state of this state (a tuple like stateID)
         self.path     = path         # cumulative path leading to this state, eg. a list ['Up', 'Right', 'Down'...]
         self.depth    = depth        # depth in search tree of this state; an integer
         self.pathCost = cost         # cumulative cost of the path to reach this state from the initial state
         return
 
-    def getSuccessors(parent):
+    def getSuccessors(self):
         '''Returns successor state objects'''
 
         actions = ["Up", "Down", "Left", "Right"]
         successors = []
+        parent = self
         childState = parent.state
 
-        n = math.sqrt(len(parent.state))
+        n = int(math.sqrt(len(parent.state)))
         idx = parent.state.index(0) #get 1D index of 0 in parent state
         row, col = index1to2(idx, n)
 
@@ -27,22 +29,22 @@ class State:
         for dir in actions:
             validAction = False         # evaluated below; determines if a proposed action is possible
 
-            if (dir == 'Up' && row - 1 >= 0):
+            if (dir == 'Up' and row - 1 >= 0):
+                    validAction = True
+                    childState[idx], childState[index2to1(col, row - 1, n)] = childState[index2to1(col, row - 1, n)], childState[idx]
+            elif (dir == 'Down' and row + 1 < n):
                     validAction = True
                     childState[idx], childState[index2to1(col, row + 1, n)] = childState[index2to1(col, row + 1, n)], childState[idx]
-            elif (dir == 'Down' && row + 1 >= n):
-                    validAction = True
-                    childState[idx], childState[index2to1(col, row + 1, n)] = childState[index2to1(col, row + 1, n)], childState[idx]
-            elif (dir == 'Left' && col - 1 >= 0 ):
+            elif (dir == 'Left' and col - 1 >= 0 ):
                     validAction = True
                     childState[idx], childState[index2to1(col - 1, row, n)] = childState[index2to1(col - 1, row, n)], childState[idx]
-            elif (dir == 'Right' && col + 1):
+            elif (dir == 'Right' and col + 1 < n):
                     validAction = True
                     childState[idx], childState[index2to1(col + 1, row, n)] = childState[index2to1(col + 1, row, n)], childState[idx]
 
             # if the action has been deemed valid, complete the creation of a successor State object
             if validAction:
-                childPath = parent.path[:]          # get the cumulative path to this point
+                childPath = parent.path          # get the cumulative path to this point
                 childPath.append(dir)
                 childDepth = parent.depth + 1
                 childCost = parent.pathCost + 1
@@ -50,6 +52,23 @@ class State:
 
         return successors
 
+class Solution:
+
+    def __init__(self, node, f_pushes, f_pops, f_currentSize, f_maxsize, n_expanded, maxDepth):
+        self.node           = node
+        self.f_pushes       = f_pushes
+        self.f_pops         = f_pops
+        self.f_currentSize  = f_currentSize
+        self.f_maxsize      = f_maxsize
+        self.n_expanded     = n_expanded
+        self.maxDepth       = maxDepth
+        return
+
+    def getPath(self):
+        return self.node.path
+
+    def getDepth(self):
+        return self.node.depth
 
 """
 Utility functions
@@ -61,9 +80,9 @@ def index1to2(idx, n):
     col = int(idx % n)
     return row, col
 
-def index2to1(row, col, n):
+def index2to1(col, row, n):
     '''Convert col,row array indices to 1d array index'''
-    return col*n + row
+    return int(col*n + row)
 
 def isGoal(current, goal):
     return current.state == goal.state
