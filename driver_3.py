@@ -26,11 +26,31 @@ def main(argv):
     goal.state = range(int(math.sqrt(len(root.state))))
 
     # Call the solver and output the solution to a text file
-    sol = bs.Solution(0,0,0,0,0,0,0)
-    print(type(sol))
-    sol = solver (root, goal, searchType)
-    print(type(sol))
-    writeOutput(sol)
+    t_start = time.time()
+
+    finish, pushes, pops, f_size, f_maxsize, expanded, maxDepth = solver (root, goal, searchType)
+
+    t_end = time.time()
+
+    ### Print output to file output.txt
+
+    orig_stdout = sys.stdout
+    f = open('output.txt', 'w')
+    sys.stdout = f
+
+    print ('path_to_goal: ',     node.path)
+    print ('cost_of_path: ')
+    print ('nodes_expanded: ',   expanded)
+    print ('fringe_size: ',      f_size)
+    print ('max_fringe_size: ',  f_maxsize)
+    print ('search_depth: ',     node.depth)
+    print ('max_search_depth: ', maxDepth)
+    print ('running_time: ',     t_end - t_start)
+    print ('max_ram_usage: ')
+
+    sys.stdout = orig_stdout
+    f.close()
+    #End of printout
 
     # prepare to measure execution time of search function
     # t_Start = time.time()
@@ -40,31 +60,7 @@ def main(argv):
     # print ('Pushes:',pushes,', Pops:',pops,', Fringe @ goal:',f_size,', Fringe max size:',f_maxsize,', expanded:',expanded )
     # print ('Depth @ goal:', finish.depth, ', maxDepth:', maxDepth)
 
-def writeOutput(sol):
-    ### Print output to file output.txt
-
-    orig_stdout = sys.stdout
-    f = open('output.txt', 'w')
-    sys.stdout = f
-
-    print ('path_to_goal:',     sol.getPath())
-    print ('cost_of_path:')
-    print ('nodes_expanded:',   sol.expanded)
-    print ('fringe_size:',      sol.f_size)
-    print ('max_fringe_size:',  sol.f_maxsize)
-    print ('search_depth:',     sol.getDepth())
-    print ('max_search_depth:', sol.maxDepth)
-    print ('running_time:')
-    print ('max_ram_usage:')
-
-    sys.stdout = orig_stdout
-    f.close()
-    #End of printout
-
 def solver(root, goal, searchType):
-
-    sol = bs.Solution(0,0,0,0,0,0,0)
-
 
     if (searchType == 'bfs'):
         sol = bfs(root, goal)
@@ -105,8 +101,7 @@ def bfs(root, goal):
         f_pops += 1
         f_currentSize -= 1
         if bs.isGoal(node, goal):
-            sol = [node, f_pushes, f_pops, f_currentSize, f_maxsize, n_expanded, maxDepth]
-            return sol
+            return node, f_pushes, f_pops, f_currentSize, f_maxsize, n_expanded, maxDepth
         if tuple(node.state) not in visitedNodes:
             n_expanded +=1
             visitedNodes.add(tuple(node.state))
