@@ -1,38 +1,45 @@
+import pdb
+
 def bfs(root, goal):
     """Search the shallowest nodes in the search tree first."""
 
-    '''
-    for node in problem.getSuccessors(startNode):
-        print ('bfs=>child:', node.stateID, ', action:', node.action, ', parent:', node.parentID, ', path:', node.path)
-    '''
-    maxDepth = 0
+    max_depth = 0
     n_expanded = 0
     f_currentSize = 0
     f_maxsize = 0
     f_pops = 0
     f_pushes = 0
 
-    y = bs.Queue()
-    visitedNodes = set()
-    y.push(root)
+    visited_nodes = set()
+
+    fringe = Queue()
+    fringe.push(root)
     f_pushes += 1
     f_currentSize += 1
 
-    while not y.isEmpty():
-        node = y.pop()
+    pdb.set_trace()
+
+    while not fringe.isEmpty():
+
+        node = fringe.pop()
         f_pops += 1
         f_currentSize -= 1
-        if bs.isGoal(node, goal):
-            return node, f_pushes, f_pops, f_currentSize, f_maxsize, n_expanded, maxDepth
-        if tuple(node.state) not in visitedNodes:
+
+        if isGoal(node, goal):
+            return node, f_pushes, f_pops, f_currentSize, f_maxsize, n_expanded, max_depth
+
+        if node.state not in visited_nodes:
             n_expanded +=1
-            visitedNodes.add(tuple(node.state))
+            visited_nodes.add(node.state)
             successors = node.getSuccessors()
-            for childNode in successors:
-                if tuple(childNode.state) not in visitedNodes:
-                    y.push(childNode)
-                    if childNode.depth > maxDepth:
-                        maxDepth = childNode.depth
+
+            for child_node in successors:
+                if child_node.state not in visited_nodes:
+                    fringe.push(child_node)
+
+                    if child_node.depth > max_depth:
+                        max_depth = child_node.depth
+
                     f_pushes += 1
                     f_currentSize += 1
                     if f_currentSize > f_maxsize:

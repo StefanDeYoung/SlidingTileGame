@@ -19,14 +19,14 @@ def main(argv):
     ############################################################
     searchType = argv[1]    # get search type requested (ie. bfs, dfs, ast, or ida)
 
-    ###Create root node with node.state as a list ['0','1','2',...,'8']
-    root       = State("", None, [], 0, 0)    #state, parent, path, depth, cost
+    ###Create root node with node.state as a tuple
+    root       = State(None, None, [], 0, 0)    #state, parent, path, depth, cost
     root.state = argv[2].split(',')
-    root.state = [int(x) for x in root.state]
+    root.state = tuple([int(x) for x in root.state])
 
-    ### Create goal node object with correct state as a list
-    goal = State(None, None, None, 0, 0)    #state, parent, path, depth, cost
-    goal.state = range(int(math.sqrt(len(root.state))))
+    ### Create goal node object with correct state as a tuple
+    goal = State([], None, [], None, None)    #state, parent, path, depth, cost
+    goal.state = tuple(range(int(math.sqrt(len(root.state)))))
 
     ###########################################
     ### Call the solver and time its operation
