@@ -17,8 +17,6 @@ def bfs(root, goal):
     f_pushes += 1
     f_currentSize += 1
 
-    pdb.set_trace()
-
     while not fringe.isEmpty():
 
         node = fringe.pop()
@@ -45,7 +43,8 @@ def bfs(root, goal):
                     if f_currentSize > f_maxsize:
                         f_maxsize = f_currentSize
 
-    return "We did not return a solution for some reason"
+    print("We did not return a solution for some reason")
+    return root, f_pushes, f_pops, f_currentSize, f_maxsize, n_expanded, max_depth
 
 class Queue:
     "A container with a first-in-first-out (FIFO) queuing policy."

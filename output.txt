@@ -1,0 +1,9 @@
+path_to_goal:  ['Left', 'Up', 'Right', 'Right', 'Down', 'Left', 'Up', 'Left', 'Down', 'Right', 'Right', 'Up', 'Left', 'Left']
+cost_of_path: 
+nodes_expanded:  5161
+fringe_size:  3042
+max_fringe_size:  3043
+search_depth:  14
+max_search_depth:  15
+running_time:  0.15600895881652832
+max_ram_usage: 

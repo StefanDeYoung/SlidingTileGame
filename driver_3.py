@@ -4,7 +4,7 @@ from Search_Types.bfs import bfs         #Breadth-first search solver
 from Search_Types.dfs import dfs         #Depth-first search solver
 from Search_Types.ast import ast         #A* search solver
 from Search_Types.ida import ida         #??? search solver
-
+import pdb
 
 def main(argv):
     '''
@@ -25,8 +25,8 @@ def main(argv):
     root.state = tuple([int(x) for x in root.state])
 
     ### Create goal node object with correct state as a tuple
-    goal = State([], None, [], None, None)    #state, parent, path, depth, cost
-    goal.state = tuple(range(int(math.sqrt(len(root.state)))))
+    goal = State(None, None, None, None, None)    #state, parent, path, depth, cost
+    goal.state = tuple(range((len(root.state))))
 
     ###########################################
     ### Call the solver and time its operation
@@ -53,12 +53,12 @@ def main(argv):
     f = open('output.txt', 'w')
     sys.stdout = f
 
-    print ('path_to_goal: ',     node.path)
+    print ('path_to_goal: ',     finish.path)
     print ('cost_of_path: ')
     print ('nodes_expanded: ',   expanded)
     print ('fringe_size: ',      f_size)
     print ('max_fringe_size: ',  f_maxsize)
-    print ('search_depth: ',     node.depth)
+    print ('search_depth: ',     finish.depth)
     print ('max_search_depth: ', maxDepth)
     print ('running_time: ',     t_end - t_start)
     print ('max_ram_usage: ')
